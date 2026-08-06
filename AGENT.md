@@ -22,7 +22,7 @@ ingest_document
 Conditional: if completeness_score < 40%, still proceed through the graph (do not halt), but flag missing_fields prominently in the final state so the UI can show an incomplete-data warning banner. Never block the pipeline on missing data — pharma complaints often arrive incomplete and the system must still produce a best-effort triage.
 
 ## Model routing
-- gemma2-9b-it: extract_entities, validate_completeness, detect_duplicate, generate_summary (fast, cheap, structured extraction tasks)
+- llama-3.1-8b-instant: extract_entities, validate_completeness, detect_duplicate, generate_summary (fast, structured extraction tasks)
 - llama-3.3-70b-versatile: classify_severity_risk, recommend_capa (higher-stakes reasoning, needs the bigger model)
 
 ## Prompting rules

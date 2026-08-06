@@ -9,6 +9,7 @@ Reference this file before writing ANY backend, frontend, or agent code in this 
 - Every AI output that affects severity/risk/CAPA MUST include a visible reasoning string, not just a label.
 - Frontend form fields must animate from skeleton -> filled state individually, never all at once.
 - All Groq calls go through agent/llm_client.py — never call the Groq SDK directly from a node file.
+- Groq Models: `llama-3.1-8b-instant` for fast structured tasks (extraction, completeness, duplicate, summary), `llama-3.3-70b-versatile` for heavy reasoning tasks (risk classification, CAPA recommendation).
 - Every node writes an entry to extraction_logs for auditability.
 - No hardcoded API keys. All secrets via .env, loaded through core/config.py.
 
