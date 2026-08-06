@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { extractComplaintThunk } from '../../store/slices/complaintSlice';
+import { useSelector } from 'react-redux';
+import { useExtractionStream } from '../../hooks/useExtractionStream';
 
 export default function UploadDropzone() {
-  const dispatch = useDispatch();
   const { isExtracting } = useSelector(state => state.ui);
+  const { startExtraction } = useExtractionStream();
   
   const [selectedFile, setSelectedFile] = useState(null);
   const [rawText, setRawText] = useState('');
@@ -26,7 +26,7 @@ export default function UploadDropzone() {
 
   const handleSubmit = () => {
     if (!selectedFile && !rawText.trim()) return;
-    dispatch(extractComplaintThunk({ file: selectedFile, rawText }));
+    startExtraction({ file: selectedFile, rawText });
   };
 
   return (

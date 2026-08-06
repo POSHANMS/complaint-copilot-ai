@@ -117,6 +117,48 @@ const complaintSlice = createSlice({
         state.fields[key].status = 'empty';
       });
     },
+    processNodeStreamUpdate: (state, action) => {
+      const { node, partial_state, complaint_id, final_state } = action.payload;
+
+      if (node === 'extract_entities' && partial_state?.extracted_fields) {
+        const ef = partial_state.extracted_fields;
+        Object.keys(ef).forEach(key => {
+          if (state.fields[key]) {
+            state.fields[key] = { value: ef[key] ?? '', status: 'filled' };
+          }
+        });
+      }
+
+      if (node === 'validate_completeness' && partial_state) {
+        state.completenessScore = partial_state.completeness_score || 0;
+        state.missingFields = partial_state.missing_fields || [];
+      }
+
+      if (node === 'classify_severity_risk' && partial_state) {
+        state.severity = { value: partial_state.severity || 'Minor', status: 'filled' };
+        state.priority = { value: partial_state.priority || 'Low', status: 'filled' };
+        state.riskScore = partial_state.risk_score || 0;
+        state.riskReasoning = partial_state.risk_reasoning || '';
+      }
+
+      if (node === 'detect_duplicate' && partial_state) {
+        state.isDuplicate = partial_state.is_duplicate || false;
+        state.duplicateMatchId = partial_state.duplicate_match_id || null;
+      }
+
+      if (node === 'recommend_capa' && partial_state) {
+        state.capaRecommendation = partial_state.capa_recommendation || '';
+      }
+
+      if (node === 'generate_summary' && partial_state) {
+        state.aiSummary = partial_state.summary || '';
+      }
+
+      if (node === 'END') {
+        if (complaint_id) state.complaintId = complaint_id;
+        if (final_state?.summary) state.aiSummary = final_state.summary;
+      }
+    },
     resetComplaintState: () => initialState,
   },
   extraReducers: (builder) => {
@@ -146,6 +188,7 @@ export const {
   setSingleField,
   setAllFieldsLoading,
   setAllFieldsEmpty,
+  processNodeStreamUpdate,
   resetComplaintState,
 } = complaintSlice.actions;
 
