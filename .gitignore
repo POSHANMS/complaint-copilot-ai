@@ -33,3 +33,7 @@ frontend/coverage/
 backend/.pytest_cache/
 backend/htmlcov/
 .mypy_cache/
+
+# Playwright E2E artifacts
+frontend/playwright-report/
+frontend/test-results/

@@ -80,3 +80,72 @@ jobs:
         with:
           name: frontend-coverage
           path: frontend/coverage/lcov.info
+
+  # ── E2E · Playwright ─────────────────────────────────────────────────────
+  # Runs only when GROQ_API_KEY is available (live server + real LLM call).
+  # Skip in forks or draft PRs that don't have the secret.
+  e2e:
+    name: E2E · Playwright
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    # Gate on secret presence — evaluates to '' in forks (skips job safely)
+    if: ${{ secrets.GROQ_API_KEY != '' }}
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install backend dependencies
+        run: pip install -r ../backend/requirements.txt
+        working-directory: frontend
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Start backend server (background)
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DATABASE_URL: sqlite:///./e2e_ci.db
+        run: |
+          cd ../backend
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          # Wait until backend is accepting connections (up to 30s)
+          timeout 30 bash -c 'until curl -sf http://localhost:8000/health; do sleep 1; done'
+        working-directory: frontend
+
+      - name: Start frontend dev server (background)
+        run: |
+          npm run dev &
+          # Wait until Vite is ready
+          timeout 30 bash -c 'until curl -sf http://localhost:3000; do sleep 1; done'
+
+      - name: Run Playwright E2E tests
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
