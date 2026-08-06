@@ -1,17 +1,41 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import UploadDropzone from './UploadDropzone';
 import ExtractionProgressBar from './ExtractionProgressBar';
+import ChatMessageList from './ChatMessageList';
+import ChatInput from './ChatInput';
 
 import RiskScoreCard from '../RiskPanel/RiskScoreCard';
 import CompletenessChecklist from '../RiskPanel/CompletenessChecklist';
-
 import CAPARecommendationCard from '../RiskPanel/CAPARecommendationCard';
 import DuplicateWarningBanner from '../RiskPanel/DuplicateWarningBanner';
 
+import { sendChatMessage } from '../../store/slices/chatSlice';
+
 export default function AICopilotPanel() {
-  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, capaRecommendation, isDuplicate, duplicateMatchId, extractionError } = useSelector(state => state.complaint);
+  const dispatch = useDispatch();
+  const {
+    complaintId,
+    aiSummary,
+    severity,
+    priority,
+    riskScore,
+    riskReasoning,
+    completenessScore,
+    missingFields,
+    capaRecommendation,
+    isDuplicate,
+    duplicateMatchId,
+    extractionError
+  } = useSelector(state => state.complaint);
+
   const { isExtracting } = useSelector(state => state.ui);
+  const { messages, isLoading: isChatLoading, suggestions } = useSelector(state => state.chat);
+
+  const handleSendMessage = (msgText) => {
+    if (!complaintId) return;
+    dispatch(sendChatMessage({ complaintId, message: msgText }));
+  };
 
   return (
     <div className="copilot-panel">
@@ -66,6 +90,36 @@ export default function AICopilotPanel() {
               isDuplicate={isDuplicate}
               duplicateMatchId={duplicateMatchId}
             />
+
+            {/* Interactive Chat Section */}
+            <div style={{
+              marginTop: '16px',
+              paddingTop: '14px',
+              borderTop: '1px solid var(--border-md)',
+            }}>
+              <div style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}>
+                💬 Interactive Copilot Chat
+              </div>
+
+              <ChatMessageList
+                messages={messages}
+                isLoading={isChatLoading}
+                suggestions={suggestions}
+                onSelectSuggestion={handleSendMessage}
+              />
+
+              <ChatInput
+                onSend={handleSendMessage}
+                disabled={isExtracting || !complaintId || isChatLoading}
+              />
+            </div>
           </>
         )}
 

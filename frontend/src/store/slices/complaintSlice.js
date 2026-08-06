@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { apiExtractComplaint } from '../../api/client';
 import { setExtracting, setProgress } from './uiSlice';
+import { fetchSuggestions, clearChat } from './chatSlice';
 
 const FIELDS = [
   'complaint_source',
@@ -25,10 +26,10 @@ const createEmptyFieldsState = () => {
 };
 
 const initialState = {
+  complaintId: null,
   fields: createEmptyFieldsState(),
   aiSummary: '',
   extractionError: null,
-  // Future Step 4 nodes (stay empty/idle in Step 3)
   severity: { value: null, status: 'empty' },
   priority: { value: null, status: 'empty' },
   completenessScore: 0,
@@ -63,6 +64,8 @@ export const extractComplaintThunk = createAsyncThunk(
       dispatch(setProgress({ progress: 100, statusText: 'Extraction complete!' }));
       dispatch(setExtracting(false));
 
+      dispatch(clearChat());
+
       // Stagger field updates (150-300ms per field)
       const extracted = result.extracted_fields || {};
       const fieldsList = Object.keys(extracted);
@@ -73,6 +76,10 @@ export const extractComplaintThunk = createAsyncThunk(
         
         await new Promise(r => setTimeout(r, 180));
         dispatch(setSingleField({ field: fieldName, value: fieldValue, status: 'filled' }));
+      }
+
+      if (result.complaint_id) {
+        dispatch(fetchSuggestions(result.complaint_id));
       }
 
       return result;
@@ -116,6 +123,7 @@ const complaintSlice = createSlice({
     builder
       .addCase(extractComplaintThunk.fulfilled, (state, action) => {
         const payload = action.payload;
+        state.complaintId = payload.complaint_id || null;
         state.aiSummary = payload.summary || '';
         state.severity = { value: payload.severity || 'Minor', status: 'filled' };
         state.priority = { value: payload.priority || 'Low', status: 'filled' };
