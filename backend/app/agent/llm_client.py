@@ -3,7 +3,8 @@ from groq import Groq
 from app.core.config import settings
 from app.core.logging import logger
 
-MODEL_GEMMA = "gemma2-9b-it"
+# Note: Groq decommissioned gemma2-9b-it; llama-3.1-8b-instant is the active fast model
+MODEL_GEMMA = "llama-3.1-8b-instant"
 MODEL_LLAMA_HEAVY = "llama-3.3-70b-versatile"
 
 def get_groq_client() -> Groq:
