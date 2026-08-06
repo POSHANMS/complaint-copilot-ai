@@ -85,7 +85,12 @@ class TestGraphSmokeTxt:
         assert isinstance(result.get("risk_score"), float)
         assert len(result.get("risk_reasoning", "")) > 30
 
+        # Completeness fields from Node 5 (validate_completeness)
+        assert isinstance(result.get("completeness_score"), (int, float))
+        assert isinstance(result.get("missing_fields"), list)
+
         print(f"\n[TXT TEST] Extracted fields: {fields}")
+        print(f"[TXT TEST] Completeness: {result.get('completeness_score')}%, Missing: {result.get('missing_fields')}")
         print(f"[TXT TEST] Severity: {result.get('severity')}, Priority: {result.get('priority')}, Score: {result.get('risk_score')}")
         print(f"[TXT TEST] Risk Reasoning: {result.get('risk_reasoning')}")
         print(f"[TXT TEST] Summary: {summary}")

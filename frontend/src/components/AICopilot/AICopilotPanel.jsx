@@ -4,9 +4,10 @@ import UploadDropzone from './UploadDropzone';
 import ExtractionProgressBar from './ExtractionProgressBar';
 
 import RiskScoreCard from '../RiskPanel/RiskScoreCard';
+import CompletenessChecklist from '../RiskPanel/CompletenessChecklist';
 
 export default function AICopilotPanel() {
-  const { aiSummary, severity, priority, riskScore, riskReasoning, extractionError } = useSelector(state => state.complaint);
+  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, extractionError } = useSelector(state => state.complaint);
   const { isExtracting } = useSelector(state => state.ui);
 
   return (
@@ -47,6 +48,11 @@ export default function AICopilotPanel() {
               priority={priority?.value}
               riskScore={riskScore}
               riskReasoning={riskReasoning}
+            />
+
+            <CompletenessChecklist
+              completenessScore={completenessScore}
+              missingFields={missingFields}
             />
           </>
         )}
