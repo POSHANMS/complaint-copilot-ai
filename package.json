@@ -6,5 +6,8 @@
     "dev:backend": "cd backend && uvicorn app.main:app --reload",
     "dev:frontend": "cd frontend && npm run dev"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
 }
