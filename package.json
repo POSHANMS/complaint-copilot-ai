@@ -1,0 +1,10 @@
+{
+  "name": "complaint-copilot-ai",
+  "version": "1.0.0",
+  "description": "AI-Powered Customer Complaint Management System",
+  "scripts": {
+    "dev:backend": "cd backend && uvicorn app.main:app --reload",
+    "dev:frontend": "cd frontend && npm run dev"
+  },
+  "private": true
+}
