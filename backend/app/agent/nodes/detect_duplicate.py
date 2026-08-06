@@ -1,7 +1,8 @@
 """
 LangGraph Node: detect_duplicate
 Role: Performs QMS batch-tracing duplicate detection by querying existing rows
-in the complaints table for matching batch_lot_number or product/description similarity.
+in the complaints table for matching batch_lot_number.
+Always links duplicate_match_id to the ORIGINAL (root canonical) complaint.
 Writes entry to extraction_logs table for auditability.
 """
 import time
@@ -9,6 +10,7 @@ from app.agent.state import ComplaintState
 from app.db.database import SessionLocal, log_node_execution
 from app.db.models import Complaint
 from app.core.logging import logger
+
 
 def detect_duplicate_node(state: ComplaintState) -> dict:
     start_time = time.time()
@@ -26,16 +28,20 @@ def detect_duplicate_node(state: ComplaintState) -> dict:
         try:
             db = SessionLocal()
             try:
-                # Query DB for prior complaints matching the same batch_lot_number
-                existing = db.query(Complaint).filter(
+                # Query DB for the ORIGINAL (earliest) complaint for this batch
+                original = db.query(Complaint).filter(
                     Complaint.batch_lot_number == clean_batch
-                ).order_by(Complaint.created_at.desc()).first()
+                ).order_by(Complaint.created_at.asc()).first()
 
-                if existing:
+                if original:
                     is_duplicate = True
-                    duplicate_match_id = existing.id
-                    matched_details = f"Match found: Complaint ID {existing.id[:8]}... (Product: {existing.product_name}, Date: {existing.complaint_date or 'N/A'})"
-                    logger.info(f"detect_duplicate_node: DUPLICATE DETECTED for batch {clean_batch} -> matched ID {existing.id}")
+                    # Always link directly to the root canonical complaint ID
+                    duplicate_match_id = original.duplicate_match_id or original.id
+                    matched_details = (
+                        f"Match found: Canonical Complaint ID {duplicate_match_id[:8]}... "
+                        f"(Product: {original.product_name}, Date: {original.complaint_date or 'N/A'})"
+                    )
+                    logger.info(f"detect_duplicate_node: DUPLICATE DETECTED for batch {clean_batch} -> canonical root ID {duplicate_match_id}")
                 else:
                     logger.info(f"detect_duplicate_node: No duplicate found for batch {clean_batch}")
             finally:
