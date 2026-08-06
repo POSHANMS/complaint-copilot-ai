@@ -8,6 +8,28 @@ from app.agent.prompts.chat_prompt import CHAT_SYSTEM_PROMPT_TEMPLATE
 from app.core.logging import logger
 
 
+def _extract_negative_constraints(complaint) -> str:
+    """Extract explicit non-events / negative findings to prevent severity drift."""
+    desc = (complaint.detailed_description or "").lower()
+    reasoning = (complaint.risk_reasoning or "").lower()
+    combined = f"{desc} {reasoning}"
+
+    constraints = []
+    if "no hospital" in combined or "hospitalisation" in combined or "hospitalization" in combined:
+        constraints.append("- No hospitalization was required or reported.")
+    if "resolved" in combined:
+        constraints.append("- Symptoms were temporary and resolved upon discontinuing product use.")
+    if "mild" in combined:
+        constraints.append("- Adverse health effect was characterized as mild (not severe or life-threatening).")
+    if "no death" in combined or "non-fatal" in combined or "fatal" not in combined:
+        constraints.append("- No fatal, permanent, or life-threatening outcome occurred.")
+
+    if not constraints:
+        constraints.append("- No hospitalization, death, or life-threatening outcomes reported in the text.")
+
+    return "\n".join(constraints)
+
+
 def _build_system_prompt(complaint) -> str:
     """Build grounded system prompt from the Complaint ORM row."""
     ef_lines = []
@@ -28,9 +50,11 @@ def _build_system_prompt(complaint) -> str:
         ef_lines.append(f"  {label}: {val or 'N/A'}")
 
     missing = complaint.missing_fields or []
+    negative_constraints = _extract_negative_constraints(complaint)
 
     return CHAT_SYSTEM_PROMPT_TEMPLATE.format(
         extracted_fields_text="\n".join(ef_lines),
+        negative_constraints=negative_constraints,
         severity=complaint.initial_severity or "N/A",
         priority=complaint.priority or "N/A",
         risk_score=complaint.risk_score or 0,
@@ -66,7 +90,6 @@ def chat_with_complaint(complaint, user_message: str, chat_history: list) -> str
 
     try:
         logger.info(f"chat_with_complaint: sending to Groq with {len(messages)} messages in context")
-        # Direct multi-turn call using messages array
         from groq import Groq
         from app.core.config import settings
 
@@ -74,7 +97,7 @@ def chat_with_complaint(complaint, user_message: str, chat_history: list) -> str
         response = client.chat.completions.create(
             model=MODEL_GEMMA,
             messages=messages,
-            temperature=0.3,
+            temperature=0.2,  # Low temperature for strict factual adherence
             max_tokens=500,
         )
         reply = response.choices[0].message.content.strip()
