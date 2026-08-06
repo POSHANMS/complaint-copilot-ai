@@ -3,6 +3,7 @@ FastAPI Route: POST /api/complaints/extract
 Accepts: multipart file upload (PDF/DOCX/TXT) OR raw text body.
 Runs the 7-node LangGraph complaint_pipeline via real SSE streaming (or JSON),
 persists the complaint to DB, and emits node completion events in real time.
+Enforces 10MB max file size limit and strict file type/magic-byte validation.
 """
 import asyncio
 import json
@@ -17,6 +18,8 @@ from app.db.models import Complaint
 from app.core.logging import logger
 
 router = APIRouter(prefix="/complaints", tags=["Extraction"])
+
+MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 NODE_PROGRESS_MAP = {
     "ingest_document":        (14, "Parsing & ingesting document..."),
@@ -79,6 +82,7 @@ async def extract_complaint(
 ):
     """
     Trigger the 7-node LangGraph extraction pipeline.
+    Enforces 10MB file size limit and strict file format / magic-byte validation.
     If stream=True (default), streams SSE node_complete events as nodes execute.
     If stream=False, returns standard JSON.
     """
@@ -87,9 +91,27 @@ async def extract_complaint(
 
     if file and file.filename:
         content = await file.read()
-        raw_input, input_type = parse_document(content, file.filename)
-        logger.info(f"extract_complaint: parsed file '{file.filename}' -> {len(raw_input)} chars")
+        if len(content) > MAX_FILE_SIZE_BYTES:
+            size_mb = len(content) / (1024 * 1024)
+            raise HTTPException(
+                status_code=413,
+                detail=f"File '{file.filename}' exceeds maximum allowed size limit of 10MB ({size_mb:.1f}MB uploaded)."
+            )
+
+        try:
+            raw_input, input_type = parse_document(content, file.filename)
+            logger.info(f"extract_complaint: parsed file '{file.filename}' -> {len(raw_input)} chars")
+        except ValueError as ve:
+            raise HTTPException(status_code=422, detail=str(ve))
+
     elif raw_text:
+        text_bytes = raw_text.encode('utf-8')
+        if len(text_bytes) > MAX_FILE_SIZE_BYTES:
+            size_mb = len(text_bytes) / (1024 * 1024)
+            raise HTTPException(
+                status_code=413,
+                detail=f"Pasted text exceeds maximum allowed size limit of 10MB ({size_mb:.1f}MB submitted)."
+            )
         raw_input = raw_text.strip()
         input_type = "text"
         logger.info(f"extract_complaint: received raw_text ({len(raw_input)} chars)")
