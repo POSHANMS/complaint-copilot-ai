@@ -1,0 +1,21 @@
+PHARMACEUTICAL PRODUCT COMPLAINT REPORT (DUPLICATE BATCH)
+
+Date of Complaint: 2024-07-18
+Complaint Source: Retail Pharmacy
+Customer Name: Apollo Pharmacy, Thane
+
+Product Details:
+Product Name: Atorvastatin Tablets
+Strength/Grade: 20 mg
+Batch/Lot Number: ATR-2024-B0421
+Manufacturing Date: 2024-01-10
+Expiry Date: 2026-01-09
+
+Complaint Type: Contamination
+Quantity Affected: 5 blister packs (150 tablets)
+
+Detailed Description:
+Apollo Pharmacy in Thane reported customer returns for Atorvastatin 20mg Tablets (Batch ATR-2024-B0421).
+Multiple tablets showed dark speckling/discoloration and damaged blister sealing foil on the pack edges.
+Two patients complained of mild stomach upset after taking tablets from this lot.
+Pharmacy requested immediate stock return and batch investigation.

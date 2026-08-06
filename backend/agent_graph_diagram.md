@@ -16,12 +16,14 @@ graph TD;
 	extract_entities(extract_entities)
 	validate_completeness(validate_completeness)
 	classify_severity_risk(classify_severity_risk)
+	recommend_capa(recommend_capa)
 	generate_summary(generate_summary)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> ingest_document;
-	classify_severity_risk --> generate_summary;
+	classify_severity_risk --> recommend_capa;
 	extract_entities --> validate_completeness;
 	ingest_document --> extract_entities;
+	recommend_capa --> generate_summary;
 	validate_completeness --> classify_severity_risk;
 	generate_summary --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2
@@ -37,6 +39,7 @@ ingest_document
   -> extract_entities        [llama-3.1-8b-instant]
     -> validate_completeness  [llama-3.1-8b-instant]
       -> classify_severity_risk [llama-3.3-70b-versatile]
-        -> generate_summary     [llama-3.1-8b-instant]
-          -> END
+        -> recommend_capa      [llama-3.3-70b-versatile]
+          -> generate_summary   [llama-3.1-8b-instant]
+            -> END
 ```

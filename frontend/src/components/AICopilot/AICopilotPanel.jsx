@@ -6,8 +6,10 @@ import ExtractionProgressBar from './ExtractionProgressBar';
 import RiskScoreCard from '../RiskPanel/RiskScoreCard';
 import CompletenessChecklist from '../RiskPanel/CompletenessChecklist';
 
+import CAPARecommendationCard from '../RiskPanel/CAPARecommendationCard';
+
 export default function AICopilotPanel() {
-  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, extractionError } = useSelector(state => state.complaint);
+  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, capaRecommendation, extractionError } = useSelector(state => state.complaint);
   const { isExtracting } = useSelector(state => state.ui);
 
   return (
@@ -53,6 +55,10 @@ export default function AICopilotPanel() {
             <CompletenessChecklist
               completenessScore={completenessScore}
               missingFields={missingFields}
+            />
+
+            <CAPARecommendationCard
+              recommendation={capaRecommendation}
             />
           </>
         )}

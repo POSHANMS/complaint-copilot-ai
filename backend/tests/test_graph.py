@@ -89,10 +89,16 @@ class TestGraphSmokeTxt:
         assert isinstance(result.get("completeness_score"), (int, float))
         assert isinstance(result.get("missing_fields"), list)
 
+        # CAPA recommendation from Node 6 (recommend_capa)
+        capa = result.get("capa_recommendation", "")
+        assert len(capa) > 20
+        assert "[" in capa and "]" in capa
+
         print(f"\n[TXT TEST] Extracted fields: {fields}")
         print(f"[TXT TEST] Completeness: {result.get('completeness_score')}%, Missing: {result.get('missing_fields')}")
         print(f"[TXT TEST] Severity: {result.get('severity')}, Priority: {result.get('priority')}, Score: {result.get('risk_score')}")
         print(f"[TXT TEST] Risk Reasoning: {result.get('risk_reasoning')}")
+        print(f"[TXT TEST] CAPA Recommendation: {capa}")
         print(f"[TXT TEST] Summary: {summary}")
 
 
