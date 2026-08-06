@@ -7,6 +7,8 @@ import os
 import sys
 import pytest
 
+pytestmark = pytest.mark.live_api
+
 # Ensure backend app is importable from tests directory
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
