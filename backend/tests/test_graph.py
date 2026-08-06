@@ -79,7 +79,15 @@ class TestGraphSmokeTxt:
         assert isinstance(summary, str)
         assert len(summary) > 20, "Summary should be at least 20 characters"
 
+        # Risk assessment fields from Node 4 (classify_severity_risk)
+        assert result.get("severity") in ["Critical", "Major", "Minor"]
+        assert result.get("priority") in ["High", "Medium", "Low"]
+        assert isinstance(result.get("risk_score"), float)
+        assert len(result.get("risk_reasoning", "")) > 30
+
         print(f"\n[TXT TEST] Extracted fields: {fields}")
+        print(f"[TXT TEST] Severity: {result.get('severity')}, Priority: {result.get('priority')}, Score: {result.get('risk_score')}")
+        print(f"[TXT TEST] Risk Reasoning: {result.get('risk_reasoning')}")
         print(f"[TXT TEST] Summary: {summary}")
 
 

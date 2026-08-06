@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux';
 import UploadDropzone from './UploadDropzone';
 import ExtractionProgressBar from './ExtractionProgressBar';
 
+import RiskScoreCard from '../RiskPanel/RiskScoreCard';
+
 export default function AICopilotPanel() {
-  const { aiSummary, extractionError } = useSelector(state => state.complaint);
+  const { aiSummary, severity, priority, riskScore, riskReasoning, extractionError } = useSelector(state => state.complaint);
   const { isExtracting } = useSelector(state => state.ui);
 
   return (
@@ -29,15 +31,24 @@ export default function AICopilotPanel() {
         )}
 
         {aiSummary && !isExtracting && (
-          <div className="chat-bubble-container">
-            <div className="chat-bubble-meta">
-              <span className="ai-dot"></span>
-              <strong>Complaint Copilot AI</strong> • Executive Summary
+          <>
+            <div className="chat-bubble-container">
+              <div className="chat-bubble-meta">
+                <span className="ai-dot"></span>
+                <strong>Complaint Copilot AI</strong> • Executive Summary
+              </div>
+              <div className="chat-bubble">
+                {aiSummary}
+              </div>
             </div>
-            <div className="chat-bubble">
-              {aiSummary}
-            </div>
-          </div>
+
+            <RiskScoreCard
+              severity={severity?.value}
+              priority={priority?.value}
+              riskScore={riskScore}
+              riskReasoning={riskReasoning}
+            />
+          </>
         )}
 
         {!aiSummary && !isExtracting && !extractionError && (

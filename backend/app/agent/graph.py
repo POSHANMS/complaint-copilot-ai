@@ -1,10 +1,6 @@
 """
 LangGraph StateGraph Definition — Complaint Copilot AI
-Step 2: 3-node linear pipeline: ingest_document -> extract_entities -> generate_summary
-Remaining 4 nodes (completeness, risk, duplicate, CAPA) added in Step 4.
-
-After compiling, the Mermaid diagram of the graph is exported to
-backend/agent_graph_diagram.md for demo video use.
+Pipeline: ingest_document -> extract_entities -> classify_severity_risk -> generate_summary -> END
 """
 import os
 from langgraph.graph import StateGraph, END
@@ -12,28 +8,29 @@ from langgraph.graph import StateGraph, END
 from app.agent.state import ComplaintState
 from app.agent.nodes.ingest import ingest_document_node
 from app.agent.nodes.extract_entities import extract_entities_node
+from app.agent.nodes.classify_risk import classify_risk_node
 from app.agent.nodes.generate_summary import generate_summary_node
 from app.core.logging import logger
 
-
 def build_graph():
-    """Build and compile the 3-node complaint pipeline StateGraph."""
+    """Build and compile the complaint pipeline StateGraph."""
     workflow = StateGraph(ComplaintState)
 
-    # Register nodes
+    # Register active nodes
     workflow.add_node("ingest_document", ingest_document_node)
     workflow.add_node("extract_entities", extract_entities_node)
+    workflow.add_node("classify_severity_risk", classify_risk_node)
     workflow.add_node("generate_summary", generate_summary_node)
 
     # Linear edges
     workflow.set_entry_point("ingest_document")
     workflow.add_edge("ingest_document", "extract_entities")
-    workflow.add_edge("extract_entities", "generate_summary")
+    workflow.add_edge("extract_entities", "classify_severity_risk")
+    workflow.add_edge("classify_severity_risk", "generate_summary")
     workflow.add_edge("generate_summary", END)
 
     compiled = workflow.compile()
     return compiled
-
 
 def export_graph_diagram(compiled_graph):
     """Export the Mermaid diagram of the compiled graph to agent_graph_diagram.md."""
@@ -44,25 +41,22 @@ def export_graph_diagram(compiled_graph):
 
         content = f"""# Complaint Copilot AI — LangGraph Pipeline Diagram
 
-> Auto-generated from `graph.py`. Use this in the demo video to show the real multi-node LangGraph agent structure.
+> Auto-generated from `graph.py`.
 
-## Step 2: Active Nodes (3-node pipeline)
+## Active Pipeline Nodes
 
 ```mermaid
 {mermaid_str}
 ```
 
-## Full Pipeline (Steps 2–4)
+## Node Model Assignments
 
 ```
 ingest_document
   -> extract_entities        [llama-3.1-8b-instant]
-    -> validate_completeness  [llama-3.1-8b-instant]
-      -> classify_severity_risk [llama-3.3-70b-versatile]
-        -> detect_duplicate    [llama-3.1-8b-instant]
-          -> recommend_capa    [llama-3.3-70b-versatile]
-            -> generate_summary [llama-3.1-8b-instant]
-              -> END
+    -> classify_severity_risk [llama-3.3-70b-versatile]
+      -> generate_summary     [llama-3.1-8b-instant]
+        -> END
 ```
 """
         with open(diagram_path, "w", encoding="utf-8") as f:
@@ -73,9 +67,6 @@ ingest_document
         logger.error(f"Graph diagram export failed: {e}")
         return None
 
-
-# Compile on import — this is the object imported by routes
+# Compile graph
 complaint_pipeline = build_graph()
-
-# Export diagram automatically when graph is compiled
 _diagram_path = export_graph_diagram(complaint_pipeline)

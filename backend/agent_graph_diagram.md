@@ -1,8 +1,8 @@
 # Complaint Copilot AI — LangGraph Pipeline Diagram
 
-> Auto-generated from `graph.py`. Use this in the demo video to show the real multi-node LangGraph agent structure.
+> Auto-generated from `graph.py`.
 
-## Step 2: Active Nodes (3-node pipeline)
+## Active Pipeline Nodes
 
 ```mermaid
 ---
@@ -14,10 +14,12 @@ graph TD;
 	__start__([<p>__start__</p>]):::first
 	ingest_document(ingest_document)
 	extract_entities(extract_entities)
+	classify_severity_risk(classify_severity_risk)
 	generate_summary(generate_summary)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> ingest_document;
-	extract_entities --> generate_summary;
+	classify_severity_risk --> generate_summary;
+	extract_entities --> classify_severity_risk;
 	ingest_document --> extract_entities;
 	generate_summary --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2
@@ -26,15 +28,12 @@ graph TD;
 
 ```
 
-## Full Pipeline (Steps 2–4)
+## Node Model Assignments
 
 ```
 ingest_document
   -> extract_entities        [llama-3.1-8b-instant]
-    -> validate_completeness  [llama-3.1-8b-instant]
-      -> classify_severity_risk [llama-3.3-70b-versatile]
-        -> detect_duplicate    [llama-3.1-8b-instant]
-          -> recommend_capa    [llama-3.3-70b-versatile]
-            -> generate_summary [llama-3.1-8b-instant]
-              -> END
+    -> classify_severity_risk [llama-3.3-70b-versatile]
+      -> generate_summary     [llama-3.1-8b-instant]
+        -> END
 ```

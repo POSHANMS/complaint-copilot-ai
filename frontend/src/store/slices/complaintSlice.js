@@ -115,7 +115,17 @@ const complaintSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(extractComplaintThunk.fulfilled, (state, action) => {
-        state.aiSummary = action.payload.summary || '';
+        const payload = action.payload;
+        state.aiSummary = payload.summary || '';
+        state.severity = { value: payload.severity || 'Minor', status: 'filled' };
+        state.priority = { value: payload.priority || 'Low', status: 'filled' };
+        state.riskScore = payload.risk_score || 0;
+        state.riskReasoning = payload.risk_reasoning || '';
+        state.completenessScore = payload.completeness_score || 0;
+        state.missingFields = payload.missing_fields || [];
+        state.isDuplicate = payload.is_duplicate || false;
+        state.duplicateMatchId = payload.duplicate_match_id || null;
+        state.capaRecommendation = payload.capa_recommendation || '';
         state.extractionError = null;
       })
       .addCase(extractComplaintThunk.rejected, (state, action) => {
