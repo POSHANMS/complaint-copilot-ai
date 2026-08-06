@@ -1,59 +1,39 @@
 import React from 'react';
-import './styles/globals.css';
+import ComplaintForm from './components/ComplaintForm/ComplaintForm';
+import AICopilotPanel from './components/AICopilot/AICopilotPanel';
 
-function App() {
+export default function App() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      backgroundColor: 'var(--bg-primary)',
-      color: 'var(--text-primary)',
-      fontFamily: 'var(--font-family)',
-      padding: '2rem'
-    }}>
-      <div style={{
-        padding: '2.5rem 3.5rem',
-        borderRadius: '12px',
-        backgroundColor: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
-        textAlign: 'center',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
-      }}>
-        <h1 style={{
-          fontSize: '2.25rem',
-          fontWeight: 700,
-          margin: 0,
-          background: 'linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>
-          Complaint Copilot AI
-        </h1>
-        <p style={{
-          marginTop: '1rem',
-          color: 'var(--text-secondary)',
-          fontSize: '1.05rem'
-        }}>
-          Pharma Quality Management System Intake Copilot
-        </p>
-        <div style={{
-          marginTop: '1.5rem',
-          padding: '0.5rem 1rem',
-          borderRadius: '20px',
-          backgroundColor: 'var(--bg-surface)',
-          display: 'inline-block',
-          fontSize: '0.85rem',
-          color: 'var(--accent-primary)',
-          fontWeight: 500
-        }}>
-          Step 1: Scaffolding Complete
+    <div className="app">
+      {/* Top Navigation Header */}
+      <header className="header">
+        <div className="header-brand">
+          <div className="header-icon">🛡️</div>
+          <span>Complaint Copilot AI</span>
+          <span className="header-badge">Pharma QMS</span>
+        </div>
+
+        <div className="header-meta">
+          <div className="header-model-tag">
+            <span className="model-dot"></span>
+            <span>Groq llama-3.1-8b-instant</span>
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Step 3 Scaffolding</span>
+        </div>
+      </header>
+
+      {/* Main Split-Screen Layout */}
+      <div className="main-layout">
+        {/* Left Panel: Log Complaint Form */}
+        <div className="panel-left">
+          <ComplaintForm />
+        </div>
+
+        {/* Right Panel: AI Copilot Assistant */}
+        <div className="panel-right">
+          <AICopilotPanel />
         </div>
       </div>
     </div>
   );
 }
-
-export default App;

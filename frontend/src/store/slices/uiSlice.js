@@ -13,6 +13,10 @@ const uiSlice = createSlice({
   reducers: {
     setExtracting: (state, action) => {
       state.isExtracting = action.payload;
+      if (action.payload) {
+        state.extractionProgress = 0;
+        state.extractionStatusText = 'Initializing extraction...';
+      }
     },
     setProgress: (state, action) => {
       const { progress, statusText } = action.payload;
