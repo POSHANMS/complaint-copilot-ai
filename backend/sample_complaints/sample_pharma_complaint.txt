@@ -1,0 +1,34 @@
+PHARMACEUTICAL PRODUCT COMPLAINT REPORT
+
+Date of Complaint: 2024-07-15
+Complaint Source: Retail Pharmacy
+Customer Name: MedCare Pharmacy, Mumbai
+
+Product Details:
+Product Name: Atorvastatin Tablets
+Strength/Grade: 20 mg
+Batch/Lot Number: ATR-2024-B0421
+Manufacturing Date: 2024-01-10
+Expiry Date: 2026-01-09
+
+Complaint Type: Contamination
+Quantity Affected: 3 blister packs (90 tablets)
+
+Detailed Description:
+The pharmacist at MedCare Pharmacy, Mumbai, reported that customers returned
+three blister packs of Atorvastatin 20mg Tablets (Batch ATR-2024-B0421)
+due to the presence of unusual black discoloration on approximately 30% of
+the tablets. The tablets also had an abnormal odour described as chemical
+or musty.
+
+Upon further inspection, two of the three packs also showed signs of seal
+integrity failure -- the blister foil was partially peeled on one edge,
+potentially exposing tablets to ambient moisture. Customers reported that
+one patient experienced gastrointestinal discomfort after consuming a tablet
+from this batch, though no hospitalisation occurred.
+
+The pharmacy has quarantined the remaining stock from this batch (approximately
+12 additional blister packs) pending investigation by the manufacturer.
+
+Reported by: R. Sharma, MedCare Pharmacy
+Contact: rsharma@medcare.in | +91-98201-XXXXX
