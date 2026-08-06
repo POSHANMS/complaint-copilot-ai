@@ -32,7 +32,7 @@ async def extract_complaint(
     if file and file.filename:
         content = await file.read()
         raw_input, input_type = parse_document(content, file.filename)
-        logger.info(f"extract_complaint: parsed file '{file.filename}' → {len(raw_input)} chars")
+        logger.info(f"extract_complaint: parsed file '{file.filename}' -> {len(raw_input)} chars")
     elif raw_text:
         raw_input = raw_text.strip()
         input_type = "text"
