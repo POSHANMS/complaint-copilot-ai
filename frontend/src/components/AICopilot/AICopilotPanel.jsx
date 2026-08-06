@@ -7,9 +7,10 @@ import RiskScoreCard from '../RiskPanel/RiskScoreCard';
 import CompletenessChecklist from '../RiskPanel/CompletenessChecklist';
 
 import CAPARecommendationCard from '../RiskPanel/CAPARecommendationCard';
+import DuplicateWarningBanner from '../RiskPanel/DuplicateWarningBanner';
 
 export default function AICopilotPanel() {
-  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, capaRecommendation, extractionError } = useSelector(state => state.complaint);
+  const { aiSummary, severity, priority, riskScore, riskReasoning, completenessScore, missingFields, capaRecommendation, isDuplicate, duplicateMatchId, extractionError } = useSelector(state => state.complaint);
   const { isExtracting } = useSelector(state => state.ui);
 
   return (
@@ -59,6 +60,11 @@ export default function AICopilotPanel() {
 
             <CAPARecommendationCard
               recommendation={capaRecommendation}
+            />
+
+            <DuplicateWarningBanner
+              isDuplicate={isDuplicate}
+              duplicateMatchId={duplicateMatchId}
             />
           </>
         )}
