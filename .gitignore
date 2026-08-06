@@ -24,3 +24,12 @@ build/
 # Database / SQLite temporary files
 *.db
 *.sqlite3
+
+# Test coverage artifacts
+.coverage
+coverage.xml
+htmlcov/
+frontend/coverage/
+backend/.pytest_cache/
+backend/htmlcov/
+.mypy_cache/
